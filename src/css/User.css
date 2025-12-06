@@ -1,0 +1,76 @@
+.user_list {
+  background-color: #041a2c;
+  padding: 5px;
+}
+
+.user_name {
+  text-align: right;
+  color: white;
+  margin-right: 40px;
+  font-family: sans-serif;
+}
+
+.user_logout {
+  background-color: #ff4d4f;
+  padding: 5px;
+  margin-left: 14px;
+}
+
+.users {
+  font-family: sans-serif;
+  margin: 0
+}
+
+.tab_button {
+  padding: 5px;
+  background-color: white;
+  border: 1px solid black;
+  width: 85px;
+  font-size: 18px;
+  border-radius: 0px;
+}
+
+.tab_button.active {
+  background: #fff;
+  color: #1677ff;
+  border-color: #1677ff;
+}
+
+.edit_button {
+  border-radius: 0px;
+}
+
+.delete_button {
+  border-radius: 0px;
+  color: white;
+  background-color: #ff4d4f;
+}
+
+.user_profile {
+  padding: 30px 50px;
+  background: #f4f6f9;
+  min-height: 100vh;
+}
+
+.user_details {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.user_profile_details {
+  background: #fff;
+  padding: 30px;
+  border-radius: 10px;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
+}
+
+.user_search{
+  display: flex; 
+  gap: 10px;
+}
+
+.search_bar{
+  width: 200px;
+}
