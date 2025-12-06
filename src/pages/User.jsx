@@ -1,10 +1,12 @@
 import React, { useState } from "react";
 import { Table, Button, Input, Avatar, Space, Modal, Form, Popconfirm } from "antd";
 import { SearchOutlined, TableOutlined, BarsOutlined, LogoutOutlined } from "@ant-design/icons";
+import { useDispatch } from "react-redux";
 import Card from '../pages/Card'
 import '../css/User.css';
 
 const User = () => {
+  const dispatch = useDispatch();
   const [activeTab, setActiveTab] = useState("table");
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
@@ -63,6 +65,14 @@ const User = () => {
     setIsModalOpen(false);
   };
 
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+    dispatch({ type: "auth/logout" });
+  };
+
+  const token = localStorage.getItem("token");
+  console.log(token, "tokendata");
+
   const data = [
     {
       key: 1,
@@ -104,7 +114,7 @@ const User = () => {
   return (
     <>
       <div className="user_list">
-        <p className="user_name">Elon Musk <span className="user_logout"><LogoutOutlined /></span> </p>
+        <p className="user_name">Elon Musk <span className="user_logout" onClick={() => handleLogout()}><LogoutOutlined /></span> </p>
       </div>
       <div className="user_profile">
         <div className="user_profile_details">
