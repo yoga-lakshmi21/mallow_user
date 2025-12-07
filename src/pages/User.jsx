@@ -1,115 +1,98 @@
 import React, { useState } from "react";
-import { Table, Button, Input, Avatar, Space, Modal, Form, Popconfirm } from "antd";
+import { Table, Button, Input, Modal, Form, Popconfirm } from "antd";
 import { SearchOutlined, TableOutlined, BarsOutlined, LogoutOutlined } from "@ant-design/icons";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
+import { addUser, deleteUser, updateUser, setSearch } from "../redux/user";
 import Card from '../pages/Card'
 import '../css/User.css';
 
 const User = () => {
+  const [form] = Form.useForm();
   const dispatch = useDispatch();
   const [activeTab, setActiveTab] = useState("table");
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
+  const [editData, setEditData] = useState(null);
 
-  const confirm = e => {
+  const { list, search } = useSelector((state) => state.users);
 
+  const filteredUsers = list.filter((u) =>
+    `${u.firstname} ${u.lastname} ${u.email}`
+      .toLowerCase()
+      .includes(search.toLowerCase())
+  );
+
+  const handleAdd = (values) => {
+    form.resetFields();
+    dispatch(addUser(values));
+    setIsModalOpen(false);
   };
-  const cancel = e => {
 
+  const openEdit = (record) => {
+    setEditData(record);
+    form.setFieldsValue(record);
+    setIsModalOpen(true);
+    setIsEditing(true);
+  };
+
+  const saveEdit = (values) => {
+    dispatch(updateUser({ ...values, id: editData.id }));
+    setEditData(null);
+    setIsModalOpen(false);
   };
 
   const columns = [
     {
-      title: " ",
-      dataIndex: "avatar",
-      render: (img) => <Avatar src={img} size={45} />
+      title: "",
+      dataIndex: "image",
+      render: (img) => (
+        <img
+          src={img && img.startsWith("http") ? img : "https://via.placeholder.com/50"}
+          width={45}
+          style={{ borderRadius: "50%" }}
+          alt=""
+        />
+      )
     },
+    { title: "Email", dataIndex: "email" },
+    { title: "First Name", dataIndex: "firstname" },
+    { title: "Last Name", dataIndex: "lastname" },
     {
-      title: "Email",
-      dataIndex: "email",
-      render: (text) => <a style={{ color: "#007bff" }}>{text}</a>,
-    },
-    {
-      title: "First Name",
-      dataIndex: "first_name",
-    },
-    {
-      title: "Last Name",
-      dataIndex: "last_name",
-    },
-    {
-      title: "Action",
-      render: () => (
-        <Space>
-          <Button type="primary" className="edit_button" onClick={() => { setIsModalOpen(true); setIsEditing(true) }}>Edit</Button>
+      title: "Actions",
+      render: (_, record) => (
+        <>
+          <Button onClick={() => openEdit(record)} style={{ marginRight: 5 }}>Edit</Button>
           <Popconfirm
             title="Delete User"
             description="Are you sure to delete this user?"
-            onConfirm={confirm}
-            onCancel={cancel}
+            onConfirm={() => dispatch(deleteUser(record.id))}
+            onCancel={() => setIsModalOpen(false)}
             okText="Yes"
             cancelText="No"
           >
-            <Button danger className="delete_button">Delete</Button>
+            <Button danger >Delete</Button>
           </Popconfirm>
-        </Space>
-      ),
-    },
+        </>
+      )
+    }
   ];
-
-  const handleOk = () => {
-    setIsModalOpen(false);
-  };
 
   const handleCancel = () => {
     setIsModalOpen(false);
   };
+
+  const token = localStorage.getItem("token");
 
   const handleLogout = () => {
     localStorage.removeItem("token");
     dispatch({ type: "auth/logout" });
   };
 
-  const token = localStorage.getItem("token");
-  console.log(token, "tokendata");
-
-  const data = [
-    {
-      key: 1,
-      avatar: "https://reqres.in/img/faces/1-image.jpg",
-      email: "george.bluth@reqres.in",
-      first_name: "George",
-      last_name: "Bluth",
-    },
-    {
-      key: 2,
-      avatar: "https://reqres.in/img/faces/2-image.jpg",
-      email: "janet.weaver@reqres.in",
-      first_name: "Janet",
-      last_name: "Weaver",
-    },
-    {
-      key: 3,
-      avatar: "https://reqres.in/img/faces/3-image.jpg",
-      email: "emma.wong@reqres.in",
-      first_name: "Emma",
-      last_name: "Wong",
-    },
-    {
-      key: 4,
-      avatar: "https://reqres.in/img/faces/4-image.jpg",
-      email: "eve.holt@reqres.in",
-      first_name: "Eve",
-      last_name: "Holt",
-    },
-    {
-      key: 5,
-      avatar: "https://reqres.in/img/faces/5-image.jpg",
-      email: "charles.morris@reqres.in",
-      first_name: "Charles",
-      last_name: "Morris",
-    },
-  ];
+  const handleCreate = () => {
+    form.resetFields();
+    setIsModalOpen(true);
+    setIsEditing(false)
+  }
 
   return (
     <>
@@ -121,8 +104,8 @@ const User = () => {
           <div className="user_details">
             <h2 className="users">Users</h2>
             <div className='user_search'>
-              <Input placeholder="input search text" className='search_bar' suffix={<SearchOutlined />} />
-              <Button type="primary" onClick={() => { setIsModalOpen(true); setIsEditing(false) }}>Create User</Button>
+              <Input placeholder="input search text" onChange={(e) => dispatch(setSearch(e.target.value))} className='search_bar' suffix={<SearchOutlined />} />
+              <Button type="primary" className='create_btn' onClick={() => handleCreate()}>Create User</Button>
             </div>
           </div>
           <div>
@@ -133,33 +116,35 @@ const User = () => {
             {activeTab === "table" && (
               <Table
                 columns={columns}
-                dataSource={data}
+                dataSource={filteredUsers}
                 pagination={{ pageSize: 5 }}
-                rowKey="key"
+                rowKey="id"
               />
             )}
             {activeTab === "card" && (
-              <Card />
+              <Card users={filteredUsers} onEdit={openEdit} onDelete={(id) => dispatch(deleteUser(id))} />
             )}
           </div>
         </div>
         <Modal
-          title={isEditing ? "Edit New User" : "Create New User"}
+          title={isEditing ? "Edit User" : "Create New User"}
           open={isModalOpen}
-          onOk={handleOk}
+          onOk={() => form.submit()}
           onCancel={handleCancel}
           width={400}
           okText="Submit"
         >
           <Form
+            form={form}
             name="user"
             layout="vertical"
+            onFinish={editData ? saveEdit : handleAdd}
           >
             <Form.Item label="first Name" name="firstname">
               <Input placeholder="Please enter first name" />
             </Form.Item>
 
-            <Form.Item label="Last Name" name="Lastname">
+            <Form.Item label="Last Name" name="lastname">
               <Input placeholder="Please enter last name" />
             </Form.Item>
 
@@ -167,7 +152,7 @@ const User = () => {
               <Input placeholder="Please enter email" />
             </Form.Item>
 
-            <Form.Item label='images' name='images'>
+            <Form.Item label='images' name='image'>
               <Input placeholder="Please enter profile image link" />
             </Form.Item>
           </Form>

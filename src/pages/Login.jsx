@@ -9,23 +9,19 @@ import "../css/Login.css";
 const Login = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const { error, isLoggedIn } = useSelector((state) => state.auth);
+  const { error } = useSelector((state) => state.auth);
 
   const handleLogin = (values) => {
     const validEmail = "eve.holt@reqres.in";
     const validPassword = "cityslicka";
 
-    const { username, password, remember } = values;
+    const { username, password } = values;
 
     if (username === validEmail && password === validPassword) {
-      const token = "fake-jwt-token";
-
-      if (remember) {
-        localStorage.setItem("token", token); 
-      }
-
+      const token = Math.random().toString(36).substring(2) + Date.now();
+      localStorage.setItem("token", token);
       dispatch(loginSuccess(token));
-      navigate("/user"); 
+      navigate("/user");
     } else {
       dispatch(loginFail("Invalid email or password"));
     }
@@ -38,7 +34,7 @@ const Login = () => {
         <Form
           name="login"
           layout="vertical"
-          onFinish={handleLogin} 
+          onFinish={handleLogin}
         >
           <Form.Item
             name="username"

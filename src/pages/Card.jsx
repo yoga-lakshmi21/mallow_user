@@ -1,28 +1,30 @@
 import React from 'react';
 import { EditOutlined, DeleteOutlined } from "@ant-design/icons";
+import {  Button, Popconfirm } from "antd";
 import "../css/Card.css";
 
-const users = [
-    { id: 1, name: "John Doe", email: "demo@mallow-tech.com", img: "https://reqres.in/img/faces/1-image.jpg" },
-    { id: 2, name: "John Doe", email: "demo@mallow-tech.com", img: "https://reqres.in/img/faces/2-image.jpg" },
-    { id: 3, name: "John Doe", email: "demo@mallow-tech.com", img: "https://reqres.in/img/faces/3-image.jpg" },
-    { id: 4, name: "John Doe", email: "demo@mallow-tech.com", img: "https://reqres.in/img/faces/4-image.jpg" },
-    { id: 5, name: "John Doe", email: "demo@mallow-tech.com", img: "https://reqres.in/img/faces/5-image.jpg" },
-    { id: 6, name: "John Doe", email: "demo@mallow-tech.com", img: "https://reqres.in/img/faces/6-image.jpg" }
-];
+const Card = ({ users, onEdit, onDelete }) => {
 
-const Card = () => {
     return (
         <div className="userGrid">
             {users.map((u) => (
                 <div className="userCard" key={u.id}>
                     <div className="overlay">
-                        <button className="editBtn"><EditOutlined /></button>
-                        <button className="deleteBtn"><DeleteOutlined /></button>
+                        <Button className="editBtn" 
+                         onClick={() => onEdit(u)}  
+                        style={{ marginRight: 5 }}><EditOutlined /></Button>
+                        <Popconfirm
+                            title="Delete User"
+                            description="Are you sure to delete this user?"
+                            onConfirm={() => onDelete(u.id)} 
+                            okText="Yes"
+                            cancelText="No"
+                        >
+                            <Button danger className="deleteBtn"><DeleteOutlined /></Button>
+                        </Popconfirm>
                     </div>
-
-                    <img src={u.img} alt="User" className="avatar" />
-                    <h3>{u.name}</h3>
+                    <img src={u.image} alt="User" className="avatar" />
+                    <h3>{u.firstname}</h3>
                     <p>{u.email}</p>
                 </div>
             ))}
